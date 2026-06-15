@@ -197,6 +197,8 @@ function M:refresh()
     })
   end
 
+  local display_offset = #parent_display
+
   for _, item in ipairs(matched) do
     local display_name = parent_display .. item.name
     if item.is_dir and display_name:sub(-1) ~= "/" then
@@ -206,6 +208,7 @@ function M:refresh()
       name = item.name,
       display = display_name,
       is_dir = item.is_dir,
+      display_offset = display_offset,
       match_positions = item.match_positions,
     })
   end
@@ -242,15 +245,13 @@ function M:render_results()
 end
 
 function M:highlight_matches()
-  local path = self:get_input()
-  if path:sub(-1) == "/" then return end
-
   for idx, item in ipairs(self.results) do
     if item.match_positions and #item.match_positions > 0 then
+      local offset = item.display_offset or 0
       for _, col in ipairs(item.match_positions) do
         vim.api.nvim_buf_add_highlight(
           self.result_buf, ns_finder, "FinderMatch",
-          idx - 1, col, col + 1
+          idx - 1, offset + col, offset + col + 1
         )
       end
     end
