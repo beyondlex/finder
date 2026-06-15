@@ -50,6 +50,7 @@ function M:create_windows()
 
   self.input_buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_option(self.input_buf, "bufhidden", "wipe")
+  self:disable_completion(self.input_buf)
 
   self.input_win = vim.api.nvim_open_win(self.input_buf, true, {
     relative = "editor",
@@ -78,6 +79,21 @@ function M:create_windows()
     border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
   })
   vim.api.nvim_win_set_option(self.result_win, "winhl", "Normal:NormalFloat")
+end
+
+function M:disable_completion(buf)
+  vim.api.nvim_buf_set_option(buf, "omnifunc", "")
+  vim.api.nvim_buf_set_option(buf, "completefunc", "")
+
+  -- blink.cmp: buffer-local disable
+  pcall(vim.api.nvim_buf_set_var, buf, "blink_cmp_enabled", false)
+
+  -- nvim-cmp: buffer-local disable via its API
+  if package.loaded["cmp"] then
+    pcall(vim.api.nvim_buf_call, buf, function()
+      require("cmp").setup.buffer({ enabled = false })
+    end)
+  end
 end
 
 function M:setup_highlights()

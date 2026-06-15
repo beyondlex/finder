@@ -13,7 +13,7 @@ local ROOT = vim.g.finder_root or vim.fn.getcwd()
 -- ── Plugins ──────────────────────────────────────────────
 -- Add plugins here. lazy.nvim will be auto-installed if this list is non-empty.
 local plugins = {
-  { "saghen/blink.cmp", version = "*" },
+  -- { "saghen/blink.cmp", version = "*" },
   -- { "nvim-tree/nvim-tree.lua" },
 }
 
