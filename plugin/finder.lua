@@ -3,12 +3,25 @@ vim.g.loaded_finder = 1
 
 local finder = require("finder")
 
+local function parse_args(raw)
+  if not raw or raw == "" then return {}, "" end
+  local extensions
+  local path = raw
+  local ext_prefix = "%-%-ext%s+"
+  local ext_str = path:match(ext_prefix .. "([^%s]+)")
+  if ext_str then
+    extensions = vim.split(ext_str, ",")
+    path = path:gsub(ext_prefix .. vim.pesc(ext_str), ""):gsub("^%s+", ""):gsub("%s+$", "")
+  end
+  return extensions, path
+end
+
 local function make_cmd(mode)
   return function(opts)
     local config = { mode = mode }
-    if opts.args and opts.args ~= "" then
-      config.initial_path = opts.args
-    end
+    local extensions, path = parse_args(opts.args)
+    if #extensions > 0 then config.extensions = extensions end
+    if path and path ~= "" then config.initial_path = path end
     finder.open(config)
   end
 end

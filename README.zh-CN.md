@@ -10,6 +10,7 @@ macOS Finder「Go to Folder」体验的 Neovim 路径浏览器插件。提供交
 ## 特性
 
 - **三种模式** — `dir` / `file` / `both`（按类型过滤）
+- **扩展名过滤** — `file` 模式下可限定只展示特定扩展名的文件（如仅 `csv`、`tsv`、`json`）
 - **实时输入** — 随输入动态更新结果列表
 - **智能模式切换** — 末尾 `/` 列目录内容；否则对上级目录做模糊匹配
 - **自动列目录** — 不含 `/` 的路径（如 `~`、`foo`）若解析为目录则自动列出其内容
@@ -40,6 +41,13 @@ macOS Finder「Go to Folder」体验的 Neovim 路径浏览器插件。提供交
 | `:FinderFile ~/Downloads` | file | 浏览文件 |
 | `:FinderBoth ~/Downloads` | both | 浏览文件 + 目录 |
 
+`--ext <列表>` 限定只展示指定扩展名的文件（逗号分隔，不带点）：
+
+| 示例 | 说明 |
+|------|------|
+| `:FinderFile --ext csv,tsv,json ~/data` | 仅显示 `.csv`、`.tsv`、`.json` 文件 |
+| `:FinderFile --ext lua` | 仅显示 `.lua` 文件 |
+
 参数可选。支持 `<Tab>` 路径补全（`complete=dir/file`）。
 
 ## Lua API
@@ -50,6 +58,7 @@ local finder = require("finder")
 finder.open({
   mode = "dir",          -- "dir" | "file" | "both"
   initial_path = "~",    -- 初始路径
+  extensions = {"csv", "tsv", "json"},  -- 可选：仅显示这些扩展名的文件（file 模式）
   on_confirm = function(path)
     print("选中: " .. path)
   end,

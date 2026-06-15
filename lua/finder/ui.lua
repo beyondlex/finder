@@ -187,6 +187,26 @@ function M:refresh()
   end
 
   local all_items = fs.list(parent_dir, self.finder.mode)
+  if self.finder.extensions and #self.finder.extensions > 0 then
+    local filtered = {}
+    for _, item in ipairs(all_items) do
+      if item.is_dir then
+        table.insert(filtered, item)
+      else
+        local ext = item.name:match("%.([^%.]+)$")
+        if ext then
+          ext = ext:lower()
+          for _, allowed in ipairs(self.finder.extensions) do
+            if allowed:lower() == ext then
+              table.insert(filtered, item)
+              break
+            end
+          end
+        end
+      end
+    end
+    all_items = filtered
+  end
   local matched
   if partial == "" then
     matched = all_items

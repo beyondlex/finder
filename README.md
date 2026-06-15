@@ -10,6 +10,7 @@ floating-window UI for selecting file or directory paths via fuzzy matching.
 ## Features
 
 - **Three modes** — `dir` / `file` / `both` (filter by type)
+- **Extension filter** — in `file` mode, restrict results to specific extensions (e.g. only `csv`, `tsv`, `json`)
 - **Interactive input** — as you type, the result list updates in real-time
 - **Smart mode switching** — trailing `/` lists directory contents; otherwise
   fuzzy-matches items under the parent directory
@@ -46,6 +47,13 @@ floating-window UI for selecting file or directory paths via fuzzy matching.
 | `:FinderFile ~/Downloads` | file | Browse files |
 | `:FinderBoth ~/Downloads` | both | Browse files + directories |
 
+`--ext <list>` limits results to the given extensions (comma-separated, no dots):
+
+| Example | Description |
+|---------|-------------|
+| `:FinderFile --ext csv,tsv,json ~/data` | Only `.csv`, `.tsv`, `.json` files |
+| `:FinderFile --ext lua` | Only `.lua` files |
+
 Arguments are optional. `<Tab>` completion for paths (`complete=dir/file`).
 
 ## Lua API
@@ -56,6 +64,7 @@ local finder = require("finder")
 finder.open({
   mode = "dir",          -- "dir" | "file" | "both"
   initial_path = "~",    -- starting path
+  extensions = {"csv", "tsv", "json"},  -- optional: only show files with these extensions (file mode)
   on_confirm = function(path)
     print("Selected: " .. path)
   end,
