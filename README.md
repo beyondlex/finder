@@ -18,6 +18,9 @@ floating-window UI for selecting file or directory paths via fuzzy matching.
   directory auto-list its contents
 - **Fuzzy matching** — first character prefix filter (case-insensitive) +
   `matchfuzzypos` with lowercased query for subsequent characters
+- **`*` prefix substring match** — prefix with `*` to match anywhere in the name
+  (e.g. `*abc` finds items containing `abc` anywhere). Results are still
+  fuzzy-ordered and highlighted.
 - **Match highlighting** — matched characters highlighted only in the item name,
   not in the parent path prefix
 - **Tab completion** — completes the selected item's name into the input;
