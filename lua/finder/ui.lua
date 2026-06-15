@@ -85,10 +85,10 @@ function M:disable_completion(buf)
   vim.api.nvim_buf_set_option(buf, "omnifunc", "")
   vim.api.nvim_buf_set_option(buf, "completefunc", "")
 
-  -- blink.cmp: buffer-local disable
-  pcall(vim.api.nvim_buf_set_var, buf, "blink_cmp_enabled", false)
+  -- Standard per-buffer disable (checked by blink.cmp, nvim-cmp, etc.)
+  pcall(vim.api.nvim_buf_set_var, buf, "completion", false)
 
-  -- nvim-cmp: buffer-local disable via its API
+  -- nvim-cmp: also disable via its API
   if package.loaded["cmp"] then
     pcall(vim.api.nvim_buf_call, buf, function()
       require("cmp").setup.buffer({ enabled = false })
