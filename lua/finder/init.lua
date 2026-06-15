@@ -9,7 +9,7 @@ function Finder.new(opts)
 
   return setmetatable({
     mode = mode,
-    initial_path = opts.initial_path or "~",
+    initial_path = opts.initial_path or "~/",
     on_confirm = opts.on_confirm or function(_) end,
     on_cancel = opts.on_cancel or function() end,
   }, Finder)

@@ -301,6 +301,7 @@ function M:on_tab()
   local new_path = prefix .. item.name
   if item.is_dir then new_path = new_path .. "/" end
 
+  self.selected = 1
   self:set_input(new_path)
   self:refresh()
 end
