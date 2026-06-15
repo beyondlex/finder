@@ -141,6 +141,7 @@ function M:refresh()
 
   local expanded = fs.expand(path)
   local listing = path:sub(-1) == "/"
+  local has_slash = path:find("/") ~= nil
   local parent_dir, partial
 
   local uv = vim.uv or vim.loop
@@ -148,21 +149,24 @@ function M:refresh()
   if listing then
     parent_dir = expanded
     partial = ""
-  else
+  elseif not has_slash then
     local stat_ok, stat = pcall(uv.fs_stat, expanded)
     if stat_ok and stat and stat.type == "directory" then
       parent_dir = expanded .. "/"
       partial = ""
       listing = true
     else
-      local last_slash = expanded:match("^(.*/).*$")
-      if last_slash then
-        parent_dir = last_slash
-        partial = expanded:sub(#last_slash + 1)
-      else
-        parent_dir = expanded:match("^(.*/)") or (expanded ~= "" and "./" or "")
-        partial = expanded:match("^.*/(.+)$") or expanded
-      end
+      parent_dir = "./"
+      partial = expanded
+    end
+  else
+    local last_slash = expanded:match("^(.*/).*$")
+    if last_slash then
+      parent_dir = last_slash
+      partial = expanded:sub(#last_slash + 1)
+    else
+      parent_dir = expanded:match("^(.*/)") or (expanded ~= "" and "./" or "")
+      partial = expanded:match("^.*/(.+)$") or expanded
     end
   end
 
