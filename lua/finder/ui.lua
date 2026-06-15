@@ -189,6 +189,7 @@ function M:refresh()
     local last_slash = effective_path:match("^(.*/).*$")
     parent_display = last_slash or ""
   end
+  self._parent_display = parent_display
 
   self.results = {}
 
@@ -296,18 +297,7 @@ function M:on_tab()
   local item = self.results[self.selected]
   if item.is_self or item.name == "" then return end
 
-  local path = self:get_input()
-  local path_for_prefix = path
-  if path:sub(-1) ~= "/" then
-    local uv = vim.uv or vim.loop
-    local expanded = fs.expand(path)
-    local stat_ok, stat = pcall(uv.fs_stat, expanded)
-    if stat_ok and stat and stat.type == "directory" then
-      path_for_prefix = path .. "/"
-    end
-  end
-  local last_slash = path_for_prefix:match("^(.*/).*$")
-  local prefix = last_slash or ""
+  local prefix = self._parent_display or ""
   local new_path = prefix .. item.name
   if item.is_dir then new_path = new_path .. "/" end
 
