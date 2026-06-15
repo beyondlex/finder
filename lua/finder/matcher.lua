@@ -18,7 +18,7 @@ function M.match(items, query)
   if #query == 1 then return filtered end
 
   local names = vim.tbl_map(function(item) return item.name end, filtered)
-  local ok, result = pcall(vim.fn.matchfuzzypos, names, query)
+  local ok, result = pcall(vim.fn.matchfuzzypos, names, query:lower())
   if not ok or not result or not result[1] or #result[1] == 0 then return {} end
 
   local match_names = result[1]
