@@ -130,7 +130,7 @@ function M:set_input(text)
 end
 
 function M:refresh()
-  local path = self:get_input()
+  local path = fs.normalize(self:get_input())
   if path == "" then
     self.results = {}
     self.selected = 1
@@ -324,7 +324,7 @@ end
 
 function M:on_go_parent()
   local path = self:get_input()
-  if path == "" or path == "/" then return end
+  if path == "" or fs.is_root(path) then return end
   local parent = fs.parent(path)
   if parent == "" then
     if path:sub(1,1) == "~" then

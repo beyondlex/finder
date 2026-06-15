@@ -1,6 +1,29 @@
 local uv = uv or vim.loop
 local M = {}
 
+-- Platform path separator: \ on Windows, / on Unix
+local sep = package.config:sub(1, 1)
+
+function M.separator()
+  return sep
+end
+
+-- Normalize platform separators to / for internal consistency
+function M.normalize(path)
+  if not path then return path end
+  if sep == "\\" then
+    path = path:gsub("\\", "/")
+  end
+  return path
+end
+
+function M.is_root(path)
+  if path == "/" then return true end
+  -- Windows drive root (e.g. C:/)
+  if path:match("^[a-zA-Z]:/$") then return true end
+  return false
+end
+
 function M.expand(path)
   if not path or path == "" then return path end
   if path:sub(1, 1) == "~" then
@@ -24,14 +47,18 @@ end
 
 function M.parent(path)
   if path == "" or path == "/" then return path end
+  if M.is_root(path) then return "" end
   local p = path:gsub("/+$", "")
   if p == "" then return "/" end
+  -- Windows drive like C: (no trailing slash, no parent)
+  if p:match("^[a-zA-Z]:$") then return "" end
   local parent = p:match("^(.*/).*$")
   return parent or ""
 end
 
 function M.basename(path)
   local p = path:gsub("/+$", "")
+  -- Windows drive: C:/foo → foo, C: → C:
   return p:match("^.*/(.+)$") or p
 end
 
@@ -42,7 +69,7 @@ function M.is_dir(path)
 end
 
 function M.list(dir, mode)
-  local expanded = M.expand(dir)
+  local expanded = M.expand(M.normalize(dir))
   if not expanded or expanded == "" then return {} end
   if expanded:sub(-1) ~= "/" then expanded = expanded .. "/" end
 
