@@ -121,6 +121,11 @@ function M:setup_keymaps()
   map("i", "<C-w>", function() self:on_go_parent() end)
   map("i", "<D-Up>", function() self:on_go_parent() end)
 
+  -- Word-level operations (macOS-style)
+  map("i", "<M-BS>", function() self:on_delete_word() end)
+  map("i", "<M-b>", function() self:on_backward_word() end)
+  map("i", "<M-f>", function() self:on_forward_word() end)
+
   map("n", "<CR>", function() self:on_confirm() end)
   map("n", "<Esc>", function() self:on_cancel() end)
   map("n", "k", function() self:on_up() end)
@@ -374,6 +379,68 @@ function M:on_go_parent()
   end
   self:set_input(parent)
   self:refresh()
+end
+
+function M:on_delete_word()
+  local line = self:get_input()
+  local col = vim.api.nvim_win_get_cursor(self.input_win)[2] -- 0-indexed
+
+  if col <= 0 then return end
+
+  local i = col -- 1-indexed position in Lua string
+  -- Skip non-word characters backward (spaces, slashes, dots, etc.)
+  while i >= 1 and not line:sub(i, i):match("[%w_]") do
+    i = i - 1
+  end
+  -- Skip word characters backward
+  while i >= 1 and line:sub(i, i):match("[%w_]") do
+    i = i - 1
+  end
+
+  -- i is now 0-indexed position where deletion starts
+  local new_text = line:sub(1, i) .. line:sub(col + 1)
+  vim.api.nvim_buf_set_lines(self.input_buf, 0, -1, false, { new_text })
+  vim.api.nvim_win_set_cursor(self.input_win, { 1, i })
+  self:refresh()
+end
+
+function M:on_backward_word()
+  local line = self:get_input()
+  local col = vim.api.nvim_win_get_cursor(self.input_win)[2]
+
+  if col <= 0 then return end
+
+  local i = col
+  -- Skip non-word characters backward
+  while i >= 1 and not line:sub(i, i):match("[%w_]") do
+    i = i - 1
+  end
+  -- Skip word characters backward
+  while i >= 1 and line:sub(i, i):match("[%w_]") do
+    i = i - 1
+  end
+
+  vim.api.nvim_win_set_cursor(self.input_win, { 1, i })
+end
+
+function M:on_forward_word()
+  local line = self:get_input()
+  local col = vim.api.nvim_win_get_cursor(self.input_win)[2]
+  local len = #line
+
+  if col >= len then return end
+
+  local i = col + 2 -- 1-indexed, character right after cursor
+  -- Skip word characters forward
+  while i <= len and line:sub(i, i):match("[%w_]") do
+    i = i + 1
+  end
+  -- Skip non-word characters forward
+  while i <= len and not line:sub(i, i):match("[%w_]") do
+    i = i + 1
+  end
+
+  vim.api.nvim_win_set_cursor(self.input_win, { 1, i - 1 })
 end
 
 function M:close()
